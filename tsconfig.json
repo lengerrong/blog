@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "jsx": "react",
+    "sourceMap": true,
+    "noUnusedLocals": true,
+    "typeRoots": ["./node_modules/@types"],
+    "lib": ["dom", "es2015"],
+    "baseUrl": "./src",
+    "paths": {
+      "*": ["client/*", "admin/*", "server/*", "*"]
+    },
+    "preserveSymlinks": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "strict": true,
+  },
+  "exclude": [".vscode", ".awcache", "coverage", "dist", "node_modules", "src/**/tests"]
+}
