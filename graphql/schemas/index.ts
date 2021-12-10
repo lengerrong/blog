@@ -6,7 +6,6 @@ import path from 'path'
 
 const loadSchemas = () => {
   const dir = path.resolve('./public', 'graphql')
-  console.log(dir)
   const schemaPath = path.join(dir, 'schemas/**/*.graphql')
   const schema = loadSchemaSync(schemaPath, {
     loaders: [new GraphQLFileLoader()]
