@@ -1,11 +1,11 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { ApolloServer } from 'apollo-server-micro'
-import loadSchemas from './schemas'
 import { MicroRequest } from 'apollo-server-micro/dist/types'
 import { ServerResponse } from 'http'
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core'
-import ApolloServerContext from './types/ApolloServerContext'
+import ApolloServerContext from '../../../graphql/types/ApolloServerContext'
+import loadSchemas from '../../../graphql/schemas'
 
 const apolloServer = new ApolloServer({
   schema: loadSchemas(),

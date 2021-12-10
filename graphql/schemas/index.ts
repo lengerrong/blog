@@ -5,10 +5,9 @@ import resolvers from '../resolvers'
 import path from 'path'
 
 const loadSchemas = () => {
-  const schemaPath = path.join(
-    process.cwd(),
-    'pages/api/graphql/schemas/**/*.graphql'
-  )
+  const dir = path.resolve('./public', 'graphql')
+  console.log(dir)
+  const schemaPath = path.join(dir, 'schemas/**/*.graphql')
   const schema = loadSchemaSync(schemaPath, {
     loaders: [new GraphQLFileLoader()]
   })
