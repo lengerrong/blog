@@ -17,7 +17,10 @@ export const config = {
   }
 }
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   await startServer
   gqlHandler ||= gqlServer.createHandler({
     path: '/api/graphql'
