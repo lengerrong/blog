@@ -10,11 +10,7 @@ import {
 import { NextPage } from 'next'
 import * as React from 'react'
 import { FaFacebook, FaGithub, FaGoogle } from 'react-icons/fa'
-import { Card } from '../../components/Card'
-import { DividerWithText } from '../../components/DividerWithText'
-import { Link } from '../../components/Link'
-import { LoginForm } from '../../components/LoginForm'
-import { Logo } from '../../components/Logo'
+import { Card, DividerWithText, Link, LoginForm, Logo } from 'ui'
 
 const Login: NextPage = () => (
   <Box

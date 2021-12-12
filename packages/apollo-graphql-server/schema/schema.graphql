@@ -1,0 +1,11 @@
+  type User {
+    id: ID
+  }
+
+  type Query {
+    getUser: User
+  }
+
+  type Mutation {
+    setUser(id: ID): String
+  }

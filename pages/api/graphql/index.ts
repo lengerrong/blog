@@ -1,29 +1,14 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { ApolloServer } from 'apollo-server-micro'
-import { MicroRequest } from 'apollo-server-micro/dist/types'
-import { ServerResponse } from 'http'
-import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core'
-import ApolloServerContext from '../../../graphql/types/ApolloServerContext'
-import loadSchemas from '../../../graphql/schemas'
+import { createApolloGraphqlServer } from 'apollo-graphql-server'
 
-const apolloServer = new ApolloServer({
-  schema: loadSchemas(),
-  plugins: [
-    ApolloServerPluginLandingPageGraphQLPlayground({
-      settings: {
-        'schema.polling.enable': false
-      }
-    })
-  ],
-  introspection: true,
-  context: (context: ApolloServerContext) => {
-    return context
-  }
-})
-const startServer = apolloServer.start()
+const gqlServer = createApolloGraphqlServer()
+const startServer = gqlServer.start()
 
-type GraphqlHandler = (req: MicroRequest, res: ServerResponse) => Promise<void>
+type GraphqlHandler = (
+  req: NextApiRequest,
+  res: NextApiResponse
+) => Promise<void>
 let gqlHandler: GraphqlHandler | null = null
 
 export const config = {
@@ -34,7 +19,7 @@ export const config = {
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   await startServer
-  gqlHandler ||= apolloServer.createHandler({
+  gqlHandler ||= gqlServer.createHandler({
     path: '/api/graphql'
   })
   await gqlHandler(req, res)
