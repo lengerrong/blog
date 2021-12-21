@@ -9,11 +9,19 @@ import {
 } from '@chakra-ui/react'
 import * as React from 'react'
 import { FaGithub, FaGoogle, FaTwitter } from 'react-icons/fa'
-import { Card, DividerWithText, Link, LoginForm } from 'ui'
+import { Card, DividerWithText, Link as ALink, SigninForm } from 'ui'
+import Link from 'next/link'
 
-import { signIn } from 'next-auth/react'
+import { getSession, signIn } from 'next-auth/react'
+import { GetServerSidePropsContext } from 'next'
 
 const Signin = () => {
+  const onSubmit = (values: any) => {
+    signIn('credentials', {
+      callbackUrl: '/ghost',
+      ...values
+    })
+  }
   return (
     <Box
       bg={useColorModeValue('gray.50', 'inherit')}
@@ -27,10 +35,12 @@ const Signin = () => {
         </Heading>
         <Text mt='4' mb='8' align='center' maxW='md' fontWeight='medium'>
           <Text as='span'>Don&apos;t have an account?</Text>
-          <Link href='#'>Start free trial</Link>
+          <Link href='/auth/sign-up'>
+            <ALink href='/auth/sign-up'>Sign Up</ALink>
+          </Link>
         </Text>
         <Card>
-          <LoginForm />
+          <SigninForm onSubmit={onSubmit} />
           <DividerWithText mt='6'>or continue with</DividerWithText>
           <SimpleGrid mt='6' columns={3} spacing='3'>
             <Button
@@ -77,3 +87,21 @@ const Signin = () => {
 }
 
 export default Signin
+
+// Export the `session` prop to use sessions with Server Side Rendering
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const session = await getSession(context)
+  if (session) {
+    return {
+      redirect: {
+        destination: '/ghost',
+        permanent: false
+      }
+    }
+  }
+  return {
+    props: {
+      session
+    }
+  }
+}
