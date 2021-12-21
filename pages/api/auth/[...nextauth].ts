@@ -3,6 +3,11 @@ import GithubProvider from 'next-auth/providers/github'
 import GoogleProvider from 'next-auth/providers/google'
 import TwitterProvider from 'next-auth/providers/twitter'
 import CredentialsProvider from 'next-auth/providers/credentials'
+import axios from 'axios'
+import {
+  FireBaseGetUserDataResponse,
+  FireBaseSignInRespose
+} from '../../../utils/api/firebase/types'
 
 // For more information on each option (and a full list of options) go to
 // https://next-auth.js.org/configuration/options
@@ -29,33 +34,48 @@ export default NextAuth({
       // e.g. domain, username, password, 2FA token, etc.
       // You can pass any HTML attribute to the <input> tag through the object.
       credentials: {
-        username: {
-          label: 'Username',
+        email: {
+          label: 'Email Address',
           type: 'text',
           placeholder: 'Email Address'
         },
         password: { label: 'Password', type: 'password' }
       },
-      async authorize(credentials, req) {
+      async authorize(credentials) {
         // Add logic here to look up the user from the credentials supplied
-        const { username, password } = credentials || {}
+        const { email, password } = credentials || {}
         // Use firebase rest APIs to sign in a user
-        await new Promise((resolve) => resolve(req))
-        const user = {
-          username,
-          password
-        }
-
-        if (user) {
-          // Any object returned will be saved in `user` property of the JWT
-          return user
-        } else {
-          // If you return null or false then the credentials will be rejected
-          return null
-          // You can also Reject this callback with an Error or with a URL:
-          // throw new Error("error message") // Redirect to error page
-          // throw "/path/to/redirect"        // Redirect to a URL
-        }
+        return await axios
+          .post(
+            'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=' +
+              process.env.FIREBASE_API_KEY!,
+            { email, password }
+          )
+          .then((res) => {
+            const { idToken } = res.data as FireBaseSignInRespose
+            return axios.post(
+              'https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=' +
+                process.env.FIREBASE_API_KEY!,
+              { idToken }
+            )
+          })
+          .then((res) => {
+            const { users } = res.data as FireBaseGetUserDataResponse
+            const fireBaseUser = users.shift()
+            const id = fireBaseUser?.localId
+            const name = fireBaseUser?.displayName
+            const image = fireBaseUser?.photoUrl
+            return {
+              id,
+              name,
+              email: fireBaseUser?.email,
+              image
+            }
+          })
+          .catch((err) => {
+            console.log(err)
+            return null
+          })
       }
     })
   ],
