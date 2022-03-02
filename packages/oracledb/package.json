@@ -5,6 +5,7 @@
   "types": "./index.ts",
   "license": "MIT",
   "dependencies": {
-    "axios": "^0.26.0"
+    "axios": "^0.26.0",
+    "http-status-codes": "^2.1.4"
   }
 }
