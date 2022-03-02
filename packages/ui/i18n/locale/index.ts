@@ -15,5 +15,3 @@ export const getLocale = (lng: Language) => {
       return enUS
   }
 }
-
-export default Locale
