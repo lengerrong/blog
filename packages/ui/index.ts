@@ -1,7 +1,3 @@
-export * from './card'
-export * from './divider-with-text'
-export * from './link'
-export * from './logo'
-export * from './password-field'
-export * from './signin-form'
-export * from './signup-form'
+const m = {}
+
+export default m
