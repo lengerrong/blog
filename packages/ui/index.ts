@@ -1,3 +1,1 @@
-const m = {}
-
-export default m
+export * from './MaterialUIProvider'
