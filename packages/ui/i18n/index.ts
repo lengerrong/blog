@@ -14,8 +14,6 @@ i18n
       useSuspense: false
     }
   })
-  .catch((error: unknown) => {
-    console.error(error)
-  })
+  .catch(() => undefined)
 
 export default i18n
