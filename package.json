@@ -14,7 +14,9 @@
     "turbo-build": "turbo run build",
     "turbo-dev": "turbo run dev --parallel",
     "turbo-lint": "turbo run lint",
-    "format": "prettier --write '**/*.{ts,tsx,.md}'"
+    "format": "prettier --write '**/*.{ts,tsx,.md}'",
+    "test": "jest --ci",
+    "test:watch": "jest --watch"
   },
   "dependencies": {
     "axios": "^0.26.0",
