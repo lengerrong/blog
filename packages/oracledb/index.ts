@@ -1,5 +1,6 @@
-import axios, { AxiosError } from 'axios'
+import axios from 'axios'
 import path from 'path'
+import qs from 'qs'
 
 type CredentialsType = 'basic' | 'bearer'
 
@@ -31,20 +32,20 @@ export default class OracleSODARestApi {
    * The database schema that is enabled for Oracle REST Data Service(ORDS)
    * The default is `"admin"`
    */
-  schema: string
+  private schema: string
   /**
    * The database_ORDS_url is available by clicking COPY URL in the RESTful Services and
    * Soda area on the Autonomous Database Service Console.
    * See Access RESTful Services and SODA for REST for more information.
    * https://docs.oracle.com/en/cloud/paas/autonomous-json-database/ajdug/ords-accessing-ords-and-soda-services-autonomous-database.html
    */
-  ords_url: string
+  private ords_url: string
   /**
    * Choose how you want to aunthenticate the access to SODA for REST on Autonomous Database
    * The default is `"bearer"`, accessing SODA for REST with OAuth authentication can improve performance and security.
    *
    */
-  credentials: HttpBasicCredentials | OauthClientCredentials
+  private credentials: HttpBasicCredentials | OauthClientCredentials
 
   private oauth_token?: OauthToken
 
@@ -58,10 +59,25 @@ export default class OracleSODARestApi {
     this.credentials = credentials
   }
 
-  private async ensureOauthToken() {
-    if (this.credentials.type === 'basic') return true
+  async collection(alias: string) {
+    await this.ensureOauthToken()
+    const { access_token } = this.oauth_token!
+    const url = new URL(
+      path.join(this.schema, 'soda/latest', alias),
+      this.ords_url
+    )
+    const headers = {
+      'content-type': 'application/json',
+      Authorization: `Bearer ${access_token}`
+    }
+    return await axios.get(url.toString(), { headers })
+  }
+
+  private ensureOauthToken() {
+    if (this.credentials.type === 'basic')
+      return Promise.resolve(this.oauth_token)
     if (this.oauth_token && this.oauth_token.expires_in < new Date().getTime())
-      return true
+      return Promise.resolve(this.oauth_token)
     // oauth token expired or not obtained yet
     // obtain a new token
     const url = new URL(
@@ -70,21 +86,19 @@ export default class OracleSODARestApi {
     ).toString()
     const { client_id, client_secret } = this
       .credentials as OauthClientCredentials
-    return axios
-      .get(url, {
-        auth: {
-          username: client_id,
-          password: client_secret
-        },
-        data: {
-          grant_type: 'client_credentials'
-        }
-      })
-      .then((res) => {
-        this.oauth_token = res.data as OauthToken
-      })
-      .catch((err: Error | AxiosError) => {
-        throw err
-      })
+    const auth_token = Buffer.from(
+      `${client_id}:${client_secret}`,
+      'utf-8'
+    ).toString('base64')
+    const data = { grant_type: 'client_credentials' }
+    const config = {
+      headers: {
+        'content-type': 'application/x-www-form-urlencoded',
+        Authorization: `Basic ${auth_token}`
+      }
+    }
+    return axios.post(url, qs.stringify(data), config).then((res) => {
+      return (this.oauth_token = res.data as OauthToken)
+    })
   }
 }
