@@ -23,21 +23,23 @@ const App = () => {
     return response.json() as Promise<Query<Post>>
   }
 
-  const { data, hasNextPage, fetchNextPage, isFetching } = useInfiniteQuery(
-    'posts',
-    ({ pageParam }) => fetchPosts(pageParam as FetchPostsOptions),
-    {
-      getNextPageParam: (lastPage, pages) => {
-        if (!lastPage.hasMore) return undefined
-        return {
-          offset: pages.reduce(
-            (offset, page) => (offset += page.count),
-            POST_DEFAULT_OFFSET
-          )
+  const { data, hasNextPage, fetchNextPage, isFetching, error } =
+    useInfiniteQuery(
+      'posts',
+      ({ pageParam = { offset: 0 } }) =>
+        fetchPosts(pageParam as FetchPostsOptions),
+      {
+        getNextPageParam: (lastPage, pages) => {
+          if (!lastPage.hasMore) return undefined
+          return {
+            offset: pages.reduce(
+              (offset, page) => (offset += page.count),
+              POST_DEFAULT_OFFSET
+            )
+          }
         }
       }
-    }
-  )
+    )
 
   const onScroll = (e: SyntheticEvent) => {
     ;(async () => {
@@ -56,16 +58,17 @@ const App = () => {
 
   return (
     <div onScroll={onScroll}>
-      {data?.pages.map((page) =>
-        page.items
-          .map((item) => item.value)
-          .map((post) => (
-            <>
-              {post.title}
-              {post.plaintext}
-            </>
-          ))
-      )}
+      {!error &&
+        data?.pages.map((page) =>
+          page.items
+            .map((item) => item.value)
+            .map((post) => (
+              <>
+                {post.title}
+                {post.plaintext}
+              </>
+            ))
+        )}
     </div>
   )
 }
