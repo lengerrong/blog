@@ -64,7 +64,7 @@ const App = () => {
         scrollHeight - scrollTop <=
           clientHeight * SCROLL_TO_NEXT_PAGE_THRESHOLD_RATE
       ) {
-        ;(async () => await fetchNextPage())().catch((e) => log.info(e))
+        (async () => await fetchNextPage())().catch((e) => log.info(e))
       }
     }
     document.addEventListener('scroll', onScroll)
