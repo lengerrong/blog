@@ -1,0 +1,17 @@
+type Post {
+  slug: String
+  canonical_url: String
+  codeinjection_head: String
+  codeinjection_foot: String
+  featured: Int
+  feature_image: String
+  title: String
+  author_id: String
+  plaintext: String
+  html: String
+  mobiledoc: String
+  comment_id: String
+  published_at: String
+  created_at: String
+  updated_at: String
+}

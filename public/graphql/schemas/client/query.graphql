@@ -1,0 +1,9 @@
+type Posts {
+  items: [Post]
+  hasMore: Boolean
+  count: Int
+}
+
+type Query {
+  posts(offset: Int): Posts
+}
