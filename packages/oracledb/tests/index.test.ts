@@ -1,15 +1,15 @@
 /**
  * @jest-environment node
  */
-import OracleSODARestApi, { OauthClientCredentials } from '..'
+import OracleDB from '..'
 
-describe('OracleSODARestApi', () => {
+describe('OracleDB', () => {
   it('collection', async () => {
-    const api = new OracleSODARestApi(
-      new OauthClientCredentials(
-        'ENoZUNuN-zHiy1nrA1OGvw..',
-        'lctTIH6yjQgi1WkFk-y-2A..'
-      ),
+    const api = new OracleDB(
+      {
+        client_id: 'ENoZUNuN-zHiy1nrA1OGvw..',
+        client_secret: 'lctTIH6yjQgi1WkFk-y-2A..'
+      },
       'https://gb155dd5f199f4a-errongwindev.adb.us-sanjose-1.oraclecloudapps.com/ords/'
     )
     //const tests = await api.collection('tests')

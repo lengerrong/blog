@@ -1,25 +1,11 @@
 import axios from 'axios'
 import path from 'path'
 import qs from 'qs'
+import { Collection } from './collection'
 
-type CredentialsType = 'basic' | 'bearer'
-
-export class HttpBasicCredentials {
-  readonly type: CredentialsType = 'basic'
-  password: string
-  constructor(password: string) {
-    this.password = password
-  }
-}
-
-export class OauthClientCredentials {
-  readonly type: CredentialsType = 'bearer'
+export type OauthClientCredentials = {
   client_id: string
   client_secret: string
-  constructor(client_id: string, client_secret: string) {
-    this.client_id = client_id
-    this.client_secret = client_secret
-  }
 }
 
 type OauthToken = {
@@ -27,10 +13,10 @@ type OauthToken = {
   expires_in: number
 }
 
-export default class OracleSODARestApi {
+export default class OracleDB {
   /**
    * The database schema that is enabled for Oracle REST Data Service(ORDS)
-   * The default is `"admin"`
+   * The default is `admin`
    */
   private schema: string
   /**
@@ -38,19 +24,20 @@ export default class OracleSODARestApi {
    * Soda area on the Autonomous Database Service Console.
    * See Access RESTful Services and SODA for REST for more information.
    * https://docs.oracle.com/en/cloud/paas/autonomous-json-database/ajdug/ords-accessing-ords-and-soda-services-autonomous-database.html
+   * Usually the url has the below pattern.
+   * https://${host}-{db}.adb.${region}.oraclecloudapps.com/ords/
    */
   private ords_url: string
   /**
-   * Choose how you want to aunthenticate the access to SODA for REST on Autonomous Database
-   * The default is `"bearer"`, accessing SODA for REST with OAuth authentication can improve performance and security.
+   * accessing SODA for REST with OAuth authentication can improve performance and security.
    *
    */
-  private credentials: HttpBasicCredentials | OauthClientCredentials
+  private credentials: OauthClientCredentials
 
   private oauth_token?: OauthToken
 
   constructor(
-    credentials: HttpBasicCredentials | OauthClientCredentials,
+    credentials: OauthClientCredentials,
     ords_url: string,
     schema = 'admin'
   ) {
@@ -59,23 +46,27 @@ export default class OracleSODARestApi {
     this.credentials = credentials
   }
 
-  async collection(alias: string) {
+  async collection<T>(alias: string, query?: any, payload?: any) {
     await this.ensureOauthToken()
     const { access_token } = this.oauth_token!
     const url = new URL(
       path.join(this.schema, 'soda/latest', alias),
       this.ords_url
     )
+    url.search = qs.stringify(query)
     const headers = {
       'content-type': 'application/json',
       Authorization: `Bearer ${access_token}`
     }
-    return await axios.get(url.toString(), { headers })
+    const config = {
+      headers: headers
+    }
+    console.log('post ', url.toString())
+    return (await axios.post(url.toString(), payload, config))
+      .data as Collection<T>
   }
 
   private ensureOauthToken() {
-    if (this.credentials.type === 'basic')
-      return Promise.resolve(this.oauth_token)
     if (this.oauth_token && this.oauth_token.expires_in < new Date().getTime())
       return Promise.resolve(this.oauth_token)
     // oauth token expired or not obtained yet
@@ -84,8 +75,7 @@ export default class OracleSODARestApi {
       path.join(this.schema, 'oauth/token'),
       this.ords_url
     ).toString()
-    const { client_id, client_secret } = this
-      .credentials as OauthClientCredentials
+    const { client_id, client_secret } = this.credentials
     const auth_token = Buffer.from(
       `${client_id}:${client_secret}`,
       'utf-8'
