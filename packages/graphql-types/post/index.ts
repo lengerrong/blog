@@ -25,3 +25,9 @@ export type Posts = {
 export type PostsParams = {
   offset: number
 }
+
+export type PostsData = {
+  data: {
+    posts: Posts
+  }
+}
