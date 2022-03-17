@@ -61,7 +61,6 @@ export default class OracleDB {
     const config = {
       headers: headers
     }
-    console.log('post ', url.toString())
     return (await axios.post(url.toString(), payload, config))
       .data as Collection<T>
   }
