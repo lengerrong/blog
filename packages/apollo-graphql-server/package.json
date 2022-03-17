@@ -4,6 +4,7 @@
   "main": "./index.ts",
   "types": "./index.ts",
   "license": "MIT",
+  "private": true,
   "dependencies": {
     "@graphql-tools/graphql-file-loader": "^7.3.4",
     "@graphql-tools/load": "^7.5.2",
@@ -11,6 +12,8 @@
     "apollo-server-micro": "^3.6.3",
     "graphql": "^16.3.0",
     "micro": "^9.3.4",
-    "micro-cors": "^0.1.1"
+    "micro-cors": "^0.1.1",
+    "apollo-graphql-types": "*",
+    "logging": "*"
   }
 }

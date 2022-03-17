@@ -1,8 +1,8 @@
 import { GraphQLSchemaContext } from 'apollo-server-types'
 import { GraphQLResolveInfo } from 'graphql'
-import { Post, Posts, PostsParams } from 'graphql-types'
+import { Post, Posts, PostsParams } from 'apollo-graphql-types'
 import OracleDB from 'oracledb'
-import log from '../../../../utils/logging'
+import log from 'logging'
 
 const posts = async (
   source: any,

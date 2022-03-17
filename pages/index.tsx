@@ -1,7 +1,7 @@
 import { useInfiniteQuery } from 'react-query'
-import { Post, Posts, PostsData } from 'graphql-types'
+import { Post, Posts, PostsData } from 'apollo-graphql-types'
 import { useEffect } from 'react'
-import log from '../utils/logging'
+import log from 'logging'
 
 const POST_DEFAULT_OFFSET = 0
 const SCROLL_TO_NEXT_PAGE_THRESHOLD_RATE = 1.5
