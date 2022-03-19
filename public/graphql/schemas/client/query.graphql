@@ -7,3 +7,12 @@ type Posts {
 type Query {
   posts(offset: Int): Posts
 }
+
+type Query {
+  slugs: [String]
+}
+
+type Query {
+  post(slug: String): Post
+}
+  
