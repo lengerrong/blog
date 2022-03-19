@@ -4,20 +4,17 @@ import { useEffect } from 'react'
 import log from 'logging'
 import { GetStaticPropsContext } from 'next'
 import PostGrid from 'ui/PostGrid'
+import { graphqlAPIURL } from '../utils'
 
 const POST_DEFAULT_OFFSET = 0
 const SCROLL_TO_NEXT_PAGE_THRESHOLD_RATE = 1.5
-const GRAPHQL_API = '/api/graphql'
 
 type FetchPostsOptions = {
   offset: number
 }
 
-const fetchPosts = async (
-  url: string,
-  { offset }: FetchPostsOptions
-): Promise<Posts> => {
-  const response = await fetch(url, {
+const fetchPosts = async ({ offset }: FetchPostsOptions): Promise<Posts> => {
+  const response = await fetch(graphqlAPIURL(), {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -45,10 +42,7 @@ const fetchPosts = async (
 export async function getStaticProps(_context: GetStaticPropsContext) {
   const getFirstPage = async () => {
     try {
-      return await fetchPosts(
-        new URL(GRAPHQL_API, process.env.BLOG_URL).toString(),
-        { offset: POST_DEFAULT_OFFSET }
-      )
+      return await fetchPosts({ offset: POST_DEFAULT_OFFSET })
     } catch (e) {
       log.error(e)
       return null
@@ -76,7 +70,7 @@ const App = ({ initialData }: AppProps) => {
     useInfiniteQuery(
       'posts',
       ({ pageParam = { offset: POST_DEFAULT_OFFSET } }) =>
-        fetchPosts(GRAPHQL_API, pageParam as FetchPostsOptions),
+        fetchPosts(pageParam as FetchPostsOptions),
       {
         getNextPageParam: (lastPage, pages) => {
           if (!lastPage?.hasMore) return undefined
