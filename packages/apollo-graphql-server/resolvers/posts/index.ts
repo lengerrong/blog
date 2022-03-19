@@ -2,15 +2,13 @@ import { GraphQLSchemaContext } from 'apollo-server-types'
 import { GraphQLResolveInfo } from 'graphql'
 import { Post, Posts, PostsParams } from 'apollo-graphql-types'
 import OracleDB from 'oracledb'
-import log from 'logging'
 
 const posts = async (
-  source: any,
+  _source: any,
   { offset }: PostsParams,
-  context: GraphQLSchemaContext,
-  info: GraphQLResolveInfo
+  _context: GraphQLSchemaContext,
+  _info: GraphQLResolveInfo
 ) => {
-  log.info(source, offset, context, info)
   const db = new OracleDB(
     {
       client_id: process.env.ORACLE_DB_OAUTH_CLIENT_ID!,
