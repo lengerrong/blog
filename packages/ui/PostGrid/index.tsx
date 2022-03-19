@@ -20,27 +20,32 @@ const getPostPreview = (post: Post) => {
 const PostGrid = ({ data }: PostsProps) => {
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <Grid container spacing={{ xs: 2, md: 3 }}>
+      <Grid container>
         {data.map((post) => (
-          <Card
+          <Grid
+            container
             key={post.slug}
-            sx={{
-              width: '40vw',
-              margin: 'auto',
-              marginTop: '10vh',
-              marginBottom: '10vh'
-            }}
+            xs={11}
+            lg={5}
+            margin='auto'
+            marginTop='2rem'
+            marginBottom='2rem'
           >
-            <Link href={`/${post.slug}`}>
-              <CardContent sx={{ justifyContent: 'center' }}>
-                <Typography variant='h4'>{post.title}</Typography>
-                <Divider sx={{ marginTop: '2vh', marginBottom: '2vh' }} />
-                <Typography variant='body1' style={{ whiteSpace: 'pre-line' }}>
-                  {getPostPreview(post)}
-                </Typography>
-              </CardContent>
-            </Link>
-          </Card>
+            <Card sx={{ margin: 'auto' }}>
+              <Link href={`/${post.slug}`}>
+                <CardContent sx={{ justifyContent: 'center' }}>
+                  <Typography variant='h4'>{post.title}</Typography>
+                  <Divider sx={{ marginTop: '2vh', marginBottom: '2vh' }} />
+                  <Typography
+                    variant='body1'
+                    style={{ whiteSpace: 'pre-line' }}
+                  >
+                    {getPostPreview(post)}
+                  </Typography>
+                </CardContent>
+              </Link>
+            </Card>
+          </Grid>
         ))}
       </Grid>
     </Box>
