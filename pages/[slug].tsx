@@ -1,4 +1,5 @@
 import { Post, PostData, SlugsData } from 'apollo-graphql-types'
+import log from 'logging'
 import { graphqlAPIURL } from '../utils'
 
 export type SlugPostProps = {
@@ -18,20 +19,25 @@ const SlugPost = ({ post }: SlugPostProps) => {
 export default SlugPost
 
 const fetchSlugs = async () => {
-  const response = await fetch(graphqlAPIURL(), {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json'
-    },
-    body: JSON.stringify({
-      query: `{
+  try {
+    const response = await fetch(graphqlAPIURL(), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
+      },
+      body: JSON.stringify({
+        query: `{
         slugs
       }`
+      })
     })
-  })
-  const slugsData = (await response.json()) as SlugsData
-  return slugsData.data.slugs
+    const slugsData = (await response.json()) as SlugsData
+    return slugsData.data.slugs
+  } catch (e: unknown) {
+    log.error(e)
+    return []
+  }
 }
 
 export type SlugProps = {
@@ -55,22 +61,27 @@ export async function getStaticPaths() {
 }
 
 const fetchPost = async (slug: string) => {
-  const response = await fetch(graphqlAPIURL(), {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json'
-    },
-    body: JSON.stringify({
-      query: `{
+  try {
+    const response = await fetch(graphqlAPIURL(), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
+      },
+      body: JSON.stringify({
+        query: `{
         post(slug: "${slug}") {
           html
         }
       }`
+      })
     })
-  })
-  const postData = (await response.json()) as PostData
-  return postData.data.post
+    const postData = (await response.json()) as PostData
+    return postData.data.post
+  } catch (e: unknown) {
+    log.error(e)
+    return {} as Post
+  }
 }
 
 export async function getStaticProps({ params }: SlugParamsProps) {
