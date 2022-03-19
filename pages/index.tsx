@@ -1,45 +1,80 @@
-import { useInfiniteQuery } from 'react-query'
+import { InfiniteData, useInfiniteQuery } from 'react-query'
 import { Post, Posts, PostsData } from 'apollo-graphql-types'
 import { useEffect } from 'react'
 import log from 'logging'
+import { GetStaticPropsContext } from 'next'
 
 const POST_DEFAULT_OFFSET = 0
 const SCROLL_TO_NEXT_PAGE_THRESHOLD_RATE = 1.5
+const GRAPHQL_API = '/api/graphql'
 
-const App = () => {
-  type FetchPostsOptions = {
-    offset: number
-  }
-  const fetchPosts = async ({ offset }: FetchPostsOptions): Promise<Posts> => {
-    const response = await fetch('/api/graphql', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json'
-      },
-      body: JSON.stringify({
-        query: `{
-        posts(offset: ${offset}) {
-          items {
-            title
-            plaintext
-          }
-          hasMore
-          count
+type FetchPostsOptions = {
+  offset: number
+}
+
+const fetchPosts = async (
+  url: string,
+  { offset }: FetchPostsOptions
+): Promise<Posts> => {
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json'
+    },
+    body: JSON.stringify({
+      query: `{
+      posts(offset: ${offset}) {
+        items {
+          title
+          plaintext
         }
-      }`
-      })
+        hasMore
+        count
+      }
+    }`
     })
-    return response.json().then(({ data }: PostsData) => {
-      return data.posts
-    })
-  }
+  })
+  return response.json().then(({ data }: PostsData) => {
+    return data.posts
+  })
+}
 
-  const { data, hasNextPage, fetchNextPage, isFetching, error } =
+export async function getStaticProps(_context: GetStaticPropsContext) {
+  const getFirstPage = async () => {
+    try {
+      return await fetchPosts(
+        new URL(GRAPHQL_API, process.env.BLOG_URL).toString(),
+        { offset: POST_DEFAULT_OFFSET }
+      )
+    } catch (e) {
+      log.error(e)
+      return null
+    }
+  }
+  const firstPage = await getFirstPage()
+  return {
+    props: {
+      initialData: firstPage
+        ? {
+            pages: [firstPage],
+            pageParams: { offset: POST_DEFAULT_OFFSET }
+          }
+        : null
+    }
+  }
+}
+
+export type AppProps = {
+  initialData: InfiniteData<Posts>
+}
+
+const App = ({ initialData }: AppProps) => {
+  const { data, hasNextPage, fetchNextPage, error, isFetchingNextPage } =
     useInfiniteQuery(
       'posts',
       ({ pageParam = { offset: POST_DEFAULT_OFFSET } }) =>
-        fetchPosts(pageParam as FetchPostsOptions),
+        fetchPosts(GRAPHQL_API, pageParam as FetchPostsOptions),
       {
         getNextPageParam: (lastPage, pages) => {
           if (!lastPage?.hasMore) return undefined
@@ -50,21 +85,29 @@ const App = () => {
           return {
             offset: nextOffset
           }
-        }
+        },
+        initialData,
+        staleTime: Infinity
       }
     )
 
   useEffect(() => {
+    let isFetching = false
     const onScroll = () => {
       const { scrollHeight, scrollTop, clientHeight } =
         document.scrollingElement as HTMLDivElement
       if (
+        !isFetchingNextPage &&
         !isFetching &&
         hasNextPage &&
         scrollHeight - scrollTop <=
           clientHeight * SCROLL_TO_NEXT_PAGE_THRESHOLD_RATE
       ) {
-        (async () => await fetchNextPage())().catch((e) => log.info(e))
+        (async () => {
+          isFetching = true
+          await fetchNextPage()
+          isFetching = false
+        })().catch((e) => log.error(e))
       }
     }
     document.addEventListener('scroll', onScroll)
