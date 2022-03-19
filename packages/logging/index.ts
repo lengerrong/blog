@@ -1,18 +1,19 @@
 const log = {
   info: (...args: any[]) => {
-    if (
-      typeof window !== 'undefined' &&
-      typeof window.document !== 'undefined'
-    ) {
-      // do nothing for browser
-      return
-    }
-    if (process.env.NODE_ENV?.toLocaleLowerCase() === 'production') {
-      // TODO... log for production
-      return
-    }
-    // for development
     console.log.apply(null, args)
+  },
+  error: (...args: any[]) => {
+    console.error.apply(null, args)
+    if (process.env.NODE_ENV?.toLocaleLowerCase() === 'production') {
+      if (
+        typeof window !== 'undefined' &&
+        typeof window.document !== 'undefined'
+      ) {
+        // TODO... log error happened in client, the browser
+      } else {
+        // TODO... log error happened in server, the node.js
+      }
+    }
   }
 }
 
