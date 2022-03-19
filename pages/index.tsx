@@ -3,6 +3,7 @@ import { Post, Posts, PostsData } from 'apollo-graphql-types'
 import { useEffect } from 'react'
 import log from 'logging'
 import { GetStaticPropsContext } from 'next'
+import PostGrid from 'ui/PostGrid'
 
 const POST_DEFAULT_OFFSET = 0
 const SCROLL_TO_NEXT_PAGE_THRESHOLD_RATE = 1.5
@@ -28,6 +29,7 @@ const fetchPosts = async (
         items {
           title
           plaintext
+          slug
         }
         hasMore
         count
@@ -116,26 +118,11 @@ const App = ({ initialData }: AppProps) => {
     }
   })
 
-  const postPreview = (post: Post) => {
-    /* eslint-disable */
-    return post?.plaintext?.split('\n').slice(0, 14).join('\n')
-    /* eslint-enable */
-  }
-  return (
-    <div>
-      {!error &&
-        data?.pages?.map((page) => (
-          <div key={Math.random()}>
-            {page?.items?.map((post) => (
-              <div key={post.canonical_url}>
-                <h1>{post?.title}</h1>
-                <pre>{postPreview(post)}</pre>
-              </div>
-            ))}
-          </div>
-        ))}
-    </div>
-  )
+  const posts = data?.pages?.reduce((aposts, page) => {
+    return [...aposts, ...page.items]
+  }, [] as Post[])
+
+  return <div>{!error && posts && <PostGrid data={posts} />}</div>
 }
 
 export default App
