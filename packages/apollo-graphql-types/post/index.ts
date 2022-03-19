@@ -31,3 +31,9 @@ export type PostsData = {
     posts: Posts
   }
 }
+
+export type PostData = {
+  data: {
+    post: Post
+  }
+}
