@@ -1,4 +1,5 @@
 import { Post, PostData, SlugsData } from 'apollo-graphql-types'
+import { graphqlAPIURL } from '../utils'
 
 export type SlugPostProps = {
   post: Post
@@ -17,21 +18,18 @@ const SlugPost = ({ post }: SlugPostProps) => {
 export default SlugPost
 
 const fetchSlugs = async () => {
-  const response = await fetch(
-    new URL('/api/graphql', process.env.BLOG_URL).toString(),
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json'
-      },
-      body: JSON.stringify({
-        query: `{
+  const response = await fetch(graphqlAPIURL(), {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json'
+    },
+    body: JSON.stringify({
+      query: `{
         slugs
       }`
-      })
-    }
-  )
+    })
+  })
   const slugsData = (await response.json()) as SlugsData
   return slugsData.data.slugs
 }
@@ -57,23 +55,20 @@ export async function getStaticPaths() {
 }
 
 const fetchPost = async (slug: string) => {
-  const response = await fetch(
-    new URL('/api/graphql', process.env.BLOG_URL).toString(),
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json'
-      },
-      body: JSON.stringify({
-        query: `{
+  const response = await fetch(graphqlAPIURL(), {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json'
+    },
+    body: JSON.stringify({
+      query: `{
         post(slug: "${slug}") {
           html
         }
       }`
-      })
-    }
-  )
+    })
+  })
   const postData = (await response.json()) as PostData
   return postData.data.post
 }
