@@ -56,7 +56,7 @@ export async function getStaticPaths() {
         slug
       }
     })),
-    fallback: true
+    fallback: 'blocking'
   }
 }
 
@@ -87,9 +87,14 @@ const fetchPost = async (slug: string) => {
 export async function getStaticProps({ params }: SlugParamsProps) {
   const { slug } = params
   const post = await fetchPost(slug)
-  return {
-    props: {
-      post
+  if (post) {
+    return {
+      props: {
+        post
+      }
     }
+  }
+  return {
+    notFound: true
   }
 }
