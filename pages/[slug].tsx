@@ -51,11 +51,11 @@ export type SlugParamsProps = {
 export async function getStaticPaths() {
   const slugs = await fetchSlugs()
   return {
-    paths: slugs.map((slug) => ({
+    paths: slugs?.map((slug) => ({
       params: {
         slug
       }
-    })),
+    })) || [],
     fallback: 'blocking'
   }
 }
