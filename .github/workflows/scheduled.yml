@@ -1,0 +1,14 @@
+name: Hourly cron job
+on:
+  schedule:
+    - cron: '*/60 * * * *'
+jobs:
+  cron:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Hourly cron job
+        run: |
+          curl --request POST \
+          --url 'https://blog.errong.win/api/graphql' \
+          --header 'Content-Type: application/json' \
+          --data '{posts(offset: 0) {items {title plaintext slug} hasMore count}}'
