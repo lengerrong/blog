@@ -42,7 +42,7 @@ const posts = async (
   )
   const { hasMore, count } = offsetPosts
   return {
-    items: offsetPosts.items.map((item) => item.value),
+    items: offsetPosts.items?.map((item) => item.value),
     hasMore,
     count
   } as Posts
