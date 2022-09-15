@@ -27,3 +27,29 @@ export default async function handler(
   })
   await gqlHandler(req, res)
 }
+
+import cron from 'node-cron';
+
+cron.schedule('*/60 * * * *', () => {
+  // fetch posts every hour to avoid 
+  // oracle shared database stoped(7 days no connections) and 
+  // reclaimed(no activities in 3 months after stoped)
+  // curl --request POST \
+  // --url 'https://blog.errong.win/api/graphql' \
+  // --header 'Content-Type: application/json' \
+  // --data '{"operationName":null,"variables":{},"query":"{\n  posts(offset: 0) {\n    items {\n      title\n      plaintext\n      slug\n    }\n    hasMore\n    count\n  }\n}\n"}'
+  const url = `${process.env.BLOG_URL!}/api/graphql`;
+  const body = {
+    "query": "{\n  posts(offset: 0) {\n    items {\n      title\n      plaintext\n      slug\n    }\n    hasMore\n    count\n  }\n}\n"
+  }
+  console.log('POST ', url, new Date());
+  fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
+  }).then(async (res) => console.log(await res.json())).catch((error) => {
+    console.error(error);
+  });
+});

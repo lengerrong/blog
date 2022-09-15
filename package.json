@@ -19,6 +19,7 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
+    "@types/node-cron": "^3.0.4",
     "apollo-graphql-server": "*",
     "apollo-graphql-types": "*",
     "axios": "^0.26.0",
@@ -27,6 +28,7 @@
     "logging": "*",
     "next": "12.0.4",
     "next-auth": "^4.0.5",
+    "node-cron": "^3.0.2",
     "oracledb": "*",
     "qs": "^6.10.3",
     "react": "17.0.2",
